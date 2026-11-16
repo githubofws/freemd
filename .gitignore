@@ -1,0 +1,19 @@
+bin/
+obj/
+node_modules/
+src/MyTypora.App/wwwroot/
+*.user
+.vs/
+dist/
+
+# 测试截图与临时产物（推广素材在 demo/，保留）
+scripts/*.png
+scripts/*.pdf
+scripts/export-test.html
+
+# 临时文件
+*.log
+.mytmp-*
+
+# ZCode 工作目录
+.zcode/

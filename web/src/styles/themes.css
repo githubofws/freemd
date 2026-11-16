@@ -1,0 +1,94 @@
+/* 主题系统：CSS 变量驱动，data-theme 切换 */
+
+/* ---------- GitHub Light（默认） ---------- */
+:root,
+[data-theme='github'] {
+  --bg: #ffffff;
+  --fg: #2b2f36;
+  --fg-soft: #6b7280;
+  --border: #e2e4e9;
+  --accent: #4098f7;
+  --accent-weak: #e8f3fe;
+  --code-bg: #f6f8fa;
+  --chrome-bg: #fbfbfc;
+  --tabbar-bg: #f2f3f5;
+  --sidebar-bg: #f8f9fa;
+  --statusbar-bg: #fbfbfc;
+  --hover-bg: #eceef1;
+  --scroll-thumb: #d4d7dd;
+  color-scheme: light;
+}
+
+/* ---------- GitHub Dark ---------- */
+[data-theme='dark'] {
+  --bg: #1e2227;
+  --fg: #d7dae0;
+  --fg-soft: #8b929e;
+  --border: #333940;
+  --accent: #4d9fdb;
+  --accent-weak: #223240;
+  --code-bg: #262b31;
+  --chrome-bg: #181b1f;
+  --tabbar-bg: #22262b;
+  --sidebar-bg: #21252a;
+  --statusbar-bg: #1a1d21;
+  --hover-bg: #2c3238;
+  --scroll-thumb: #3d444d;
+  color-scheme: dark;
+}
+
+/* ---------- 纸张（护眼米黄） ---------- */
+[data-theme='paper'] {
+  --bg: #f7f3e8;
+  --fg: #3d3830;
+  --fg-soft: #857d6e;
+  --border: #e4dcc8;
+  --accent: #b07d2b;
+  --accent-weak: #f0e6cf;
+  --code-bg: #efe9d8;
+  --chrome-bg: #f2edde;
+  --tabbar-bg: #efe9d8;
+  --sidebar-bg: #f1ecdc;
+  --statusbar-bg: #f2edde;
+  --hover-bg: #e9e2cd;
+  --scroll-thumb: #d8cfb6;
+  color-scheme: light;
+}
+
+/* 让所有组件面板跟随主题变量 */
+.tabbar,
+.sidebar,
+.statusbar,
+.filetree,
+.outline,
+.tab-close:hover {
+  transition: background-color 0.15s, color 0.15s;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 打字机模式下的平滑滚动由 JS 控制 */
+
+/* 聚焦模式：非活动段落淡出 */
+.focus-mode .mytypora-write > * {
+  opacity: 0.25;
+  transition: opacity 0.2s;
+}
+
+.focus-mode .mytypora-write > *.is-active-block {
+  opacity: 1;
+}

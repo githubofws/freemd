@@ -1,0 +1,46 @@
+/* 全局基础样式：变量 + reset + 排版栈 */
+:root {
+  --bg: #ffffff;
+  --fg: #2b2f36;
+  --fg-soft: #6b7280;
+  --border: #e2e4e9;
+  --accent: #4098f7;
+  --accent-weak: #e8f3fe;
+  --code-bg: #f6f8fa;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family:
+    -apple-system,
+    'Segoe UI',
+    'Microsoft YaHei UI',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--accent-weak);
+}

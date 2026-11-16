@@ -1,0 +1,172 @@
+<Window x:Class="MyTypora.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="FreeMD" Width="1200" Height="800" MinWidth="700" MinHeight="450"
+        WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
+        Background="#FFFFFF" FontFamily="Microsoft YaHei UI" FontSize="13">
+
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="40" ResizeBorderThickness="6" CornerRadius="0"
+                  GlassFrameThickness="0" UseAeroCaptionButtons="False" />
+  </WindowChrome.WindowChrome>
+
+  <Window.Resources>
+    <!-- 菜单栏（前景色由 window:setChrome 按主题动态设置） -->
+    <Style x:Key="MenuBar" TargetType="Menu">
+      <Setter Property="Background" Value="#FBFBFC" />
+      <Setter Property="BorderBrush" Value="#E6E8EC" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="6,0" />
+    </Style>
+    <Style x:Key="TopMenuItem" TargetType="MenuItem">
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+    <Style TargetType="MenuItem">
+      <Setter Property="Padding" Value="10,5" />
+    </Style>
+
+    <!-- 自绘标题栏按钮 -->
+    <Style x:Key="CaptionButton" TargetType="Button">
+      <Setter Property="Width" Value="46" />
+      <Setter Property="Height" Value="40" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#C9CCD3" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#3A3E45" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="CloseButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#E81123" />
+          <Setter Property="Foreground" Value="White" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+
+  <DockPanel>
+    <!-- 自绘标题栏（配色随主题：window:setChrome） -->
+    <Border x:Name="TitleBarBorder" DockPanel.Dock="Top" Background="#24272E" Height="40">
+      <Grid>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+          <TextBlock x:Name="TitleText1" Text="Free" Foreground="#9AA5B5" FontSize="13" />
+          <TextBlock x:Name="TitleText2" Text="MD" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="13" Margin="1,0,0,0" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button x:Name="MinBtn" Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="OnMinimize" />
+          <Button x:Name="MaxBtn" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="OnMaximize" />
+          <Button x:Name="CloseBtn" Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="OnClose" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- 原生菜单栏：命令统一转发到 web 层处理 -->
+    <Menu x:Name="TopMenu" DockPanel.Dock="Top" Style="{StaticResource MenuBar}" Foreground="#3A4150">
+      <MenuItem Header="文件" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="新建" InputGestureText="Ctrl+N" Tag="file.new" Click="MenuCmd" />
+        <MenuItem Header="打开…" InputGestureText="Ctrl+O" Tag="file.open" Click="MenuCmd" />
+        <MenuItem Header="打开文件夹…" InputGestureText="Ctrl+Shift+O" Tag="file.openFolder" Click="MenuCmd" />
+        <MenuItem x:Name="RecentMenu" Header="最近文件" SubmenuOpened="RecentMenu_OnOpening">
+          <MenuItem Header="（空）" IsEnabled="False" />
+        </MenuItem>
+        <Separator />
+        <MenuItem Header="保存" InputGestureText="Ctrl+S" Tag="file.save" Click="MenuCmd" />
+        <MenuItem Header="另存为…" InputGestureText="Ctrl+Shift+S" Tag="file.saveAs" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="导出">
+          <MenuItem Header="PDF…" InputGestureText="Ctrl+P" Tag="export.pdf" Click="MenuCmd" />
+          <MenuItem Header="HTML…" Tag="export.html" Click="MenuCmd" />
+        </MenuItem>
+        <Separator />
+        <MenuItem Header="设置…" InputGestureText="Ctrl+," Tag="app.settings" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="退出" Tag="app.exit" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="编辑" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="撤销" InputGestureText="Ctrl+Z" Tag="edit.undo" Click="MenuCmd" />
+        <MenuItem Header="重做" InputGestureText="Ctrl+Y" Tag="edit.redo" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="剪切" InputGestureText="Ctrl+X" Tag="edit.cut" Click="MenuCmd" />
+        <MenuItem Header="复制" InputGestureText="Ctrl+C" Tag="edit.copy" Click="MenuCmd" />
+        <MenuItem Header="粘贴" InputGestureText="Ctrl+V" Tag="edit.paste" Click="MenuCmd" />
+        <MenuItem Header="全选" InputGestureText="Ctrl+A" Tag="edit.selectAll" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="查找和替换…" InputGestureText="Ctrl+F" Tag="edit.find" Click="MenuCmd" />
+        <MenuItem Header="复制为 Markdown" InputGestureText="Ctrl+Shift+C" Tag="edit.copyAsMd" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="段落" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="一级标题" InputGestureText="Ctrl+1" Tag="para.h1" Click="MenuCmd" />
+        <MenuItem Header="二级标题" InputGestureText="Ctrl+2" Tag="para.h2" Click="MenuCmd" />
+        <MenuItem Header="三级标题" InputGestureText="Ctrl+3" Tag="para.h3" Click="MenuCmd" />
+        <MenuItem Header="四级标题" InputGestureText="Ctrl+4" Tag="para.h4" Click="MenuCmd" />
+        <MenuItem Header="五级标题" InputGestureText="Ctrl+5" Tag="para.h5" Click="MenuCmd" />
+        <MenuItem Header="六级标题" InputGestureText="Ctrl+6" Tag="para.h6" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="有序列表" Tag="para.ol" Click="MenuCmd" />
+        <MenuItem Header="无序列表" Tag="para.ul" Click="MenuCmd" />
+        <MenuItem Header="任务列表" Tag="para.task" Click="MenuCmd" />
+        <MenuItem Header="引用" Tag="para.quote" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="代码块" Tag="para.code" Click="MenuCmd" />
+        <MenuItem Header="数学公式块" Tag="para.mathBlock" Click="MenuCmd" />
+        <MenuItem Header="表格" Tag="para.table" Click="MenuCmd" />
+        <MenuItem Header="链接" InputGestureText="Ctrl+K" Tag="para.link" Click="MenuCmd" />
+        <MenuItem Header="图片" Tag="para.image" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="格式" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="加粗" InputGestureText="Ctrl+B" Tag="fmt.bold" Click="MenuCmd" />
+        <MenuItem Header="斜体" InputGestureText="Ctrl+I" Tag="fmt.italic" Click="MenuCmd" />
+        <MenuItem Header="删除线" Tag="fmt.strike" Click="MenuCmd" />
+        <MenuItem Header="行内代码" Tag="fmt.code" Click="MenuCmd" />
+        <MenuItem Header="高亮" Tag="fmt.highlight" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="视图" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="大纲" Tag="view.outline" Click="MenuCmd" />
+        <MenuItem Header="文件树" Tag="view.fileTree" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="源代码模式" InputGestureText="Ctrl+/" Tag="view.sourceMode" Click="MenuCmd" />
+        <MenuItem Header="打字机模式" Tag="view.typewriter" Click="MenuCmd" />
+        <MenuItem Header="聚焦模式" Tag="view.focus" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="放大" InputGestureText="Ctrl+=" Tag="view.zoomIn" Click="MenuCmd" />
+        <MenuItem Header="缩小" InputGestureText="Ctrl+-" Tag="view.zoomOut" Click="MenuCmd" />
+        <MenuItem Header="重置缩放" InputGestureText="Ctrl+0" Tag="view.zoomReset" Click="MenuCmd" />
+        <Separator />
+        <MenuItem Header="全屏" InputGestureText="F11" Tag="view.fullscreen" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="主题" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="GitHub" Tag="theme.github" Click="MenuCmd" />
+        <MenuItem Header="夜间" Tag="theme.dark" Click="MenuCmd" />
+        <MenuItem Header="纸张" Tag="theme.paper" Click="MenuCmd" />
+      </MenuItem>
+
+      <MenuItem Header="帮助" Style="{StaticResource TopMenuItem}">
+        <MenuItem Header="关于 MyTypora" Tag="help.about" Click="MenuCmd" />
+      </MenuItem>
+    </Menu>
+
+    <wv2:WebView2 x:Name="Web" DefaultBackgroundColor="White" />
+  </DockPanel>
+</Window>
